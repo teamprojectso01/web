@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.coreflow.shop.cart.CartMapper">
+	
+	<insert id="cart_add">
+		
+		insert into 
+			cart(pro_num, mbsp_id, cart_amount)
+		values 
+			(#{pro_num}, #{mbsp_id}, #{cart_amount})
+		on duplicate key 
+		update 
+			cart_amount = cart_amount + #{cart_amount}
+		
+	</insert>
+	
+	<select id="cart_list" resultType="Map">
+	
+		select 
+				p.pro_num, 
+				p.pro_name, 
+				p.pro_price, 
+				p.pro_up_folder, 
+				p.pro_img, 
+				c.cart_amount,
+				c.cart_amount * p.pro_price as unitprice 
+			from 
+				cart c 
+			inner join 
+				products p
+			on 
+				c.pro_num = p.pro_num
+			where 
+				c.mbsp_id = #{mbsp_id}
+		
+	</select>
+	
+	<select id="cart_total_price" resultType="Integer">
+		
+		select 
+			sum(c.cart_amount * p.pro_price) as total_price
+		from 
+			cart c
+		inner join
+			products p
+		on 
+			c.pro_num = p.pro_num
+		where
+			mbsp_id = #{mbsp_id}
+	
+	</select>
+	
+	<delete id="cart_empty">
+	
+		delete from 
+			cart
+		where mbsp_id = #{mbsp_id}
+	
+	</delete>
+	
+	<delete id="cart_sel_delete">
+		
+		delete from
+			cart
+		where 
+			mbsp_id = #{mbsp_id}
+		and 
+			pro_num in
+			<foreach collection="pro_num_arr" item="item" open="(" separator="," close=")">
+				#{item}
+			</foreach>			
+	</delete>
+	
+	<update id="cart_quantity_change">
+	
+		update 
+			cart
+		set 
+			cart_amount = #{cart_amount}
+		where
+			pro_num = #{pro_num}
+		and
+			mbsp_id = #{mbsp_id}
+			
+	</update>
+</mapper>

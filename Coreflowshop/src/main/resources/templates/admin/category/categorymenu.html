@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layouts/ad_layout}">
+<th:block layout:fragment="script1">
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+</th:block>
+
+<th:block layout:fragment="content">
+  <div class="container mt-5">
+    <div class="row">
+      <div class="col">
+        <div class="card card-primary">
+          <div class="card-header">
+            <h3 class="card-title">카테고리 메뉴</h3>
+          </div>
+                  <!-- 카드 본문 -->
+          <div class="card-body">
+            <div class="row mb-3">
+
+              <!-- 1차 카테고리 -->
+              <div class="col-auto d-flex flex-column align-items-stretch" style="flex:1; min-width:300px;">
+
+                <!-- 선택창 제목 -->
+                <label for="sel-main" class="form-label mb-1">1차 카테고리</label>
+
+                <!-- 선택창 + 업다운 버튼을 나란히 배치 -->
+                <div class="d-flex align-items-stretch">
+                  
+                  <!-- 1차 카테고리 선택창 -->
+                  <select 
+                    name="cate_code" 
+                    class="form-select sel-main" 
+                    size="10" 
+                    style="width:100%; height:500px;">
+
+                    <!-- 1차 카테고리 목록 (Thymeleaf 반복문) -->
+                    <option 
+                      th:each="categoryDTO : ${firstCategories}"
+                      th:text="${categoryDTO.cate_name}"
+                      th:value="${categoryDTO.cate_code}">
+                      카테고리 적용X
+                    </option>
+                  </select>
+
+                  <!-- ▲ ▼ 버튼 -->
+                  <div class="d-flex flex-column align-items-center justify-content-center ms-2" style="width:100%;max-width:300px;">
+                    <button type="button" class="btn btn-outline-secondary mb-2 btn-up">▲</button>
+                    <button type="button" class="btn btn-outline-secondary btn-down">▼</button>
+                  </div>
+                </div>  
+                
+                <!-- 1차 카테고리 정렬 -->
+                <button type="button" id="sFcategory" class="btn btn-success d-block ma-auto mt-3" style="width:100%;max-width:300px;">
+                  
+                </button> 
+
+
+
+                <div class="d-flex justify-content-between mt-2" style="gap:0.5rem;"> 
+                  <button type="button" id="add-category" class="btn btn-primary flex-fill">등록</button>
+                  <button type="button" id="edit-category" class="btn btn-warning flex-fill">수정</button>
+                  <button type="button" id="delete-category" class="btn btn-danger flex-fill">삭제</button>
+
+                </div>
+                </div> 
+                <div class="col-auto d-flex flex-column align-items-stretch" style="flex:1; min-width:300px;">
+                <label for="sel-sub" class="form-label mb-1">2차 카테고리</label>
+                  <div class="d-flex align-items-stretch">
+                <select name="s_category" id="sel-sub" class="form-select" size="10" style="width:100%;height:500px;">                 
+                 </select>
+                  <!-- ▲▼ 이동 버튼 -->
+                  <div class="d-flex flex-column align-items-center justify-content-center ms-2" style="gap:0.5rem;">
+                    <button type="button" class="btn btn-outline-secondary mb-2 btn-up">▲</button>
+                    <button type="button" class="btn btn-outline-secondary btn-down">▼</button>
+                  </div>
+                </div>
+
+                <!-- 저장 버튼 -->
+                <button type="button" id="ss-category" class="btn btn-success d-block mx-auto mt-3" style="width:100%;max-width:300px;">
+                  2차 카테고리 저장(정렬)
+                </button>
+
+                <!-- 등록/수정/삭제 -->
+                <div class="d-flex justify-content-between mt-2" style="gap:0.5rem;">
+                  <button type="button" id="add-second-category" class="btn btn-primary flex-fill">등록</button>
+                  <button type="button" id="edit-second-category" class="btn btn-warning flex-fill">수정</button>
+                  <button type="button" id="delete-s-category" class="btn btn-danger flex-fill">삭제</button>
+                </div>
+              </div>
+              <!-- ✅ 2차 카테고리 영역 끝 -->
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🩵 모달(Modal) 구조 설명 -->
+  <!-- 
+  📘 모달(Modal)이란?
+  ➤ 사용자가 별도 페이지로 이동하지 않고, 화면 위에 ‘대화상자’를 띄워서 입력/확인/수정을 수행하게 하는 UI.
+  ➤ Bootstrap에서 제공하는 팝업창 구성 요소.
+  ➤ 모달창은 .modal, .modal-dialog, .modal-content 구조를 반드시 포함해야 작동함.
+  -->
+
+
+  <!-- 🩷 1차 카테고리 등록 모달 -->
+  <div class="modal fade" id="FCModal" tabindex="-1" aria-labelledby="FCMLabel" aria-hidden="true">
+    <!-- 
+    class="modal fade" ➤ Bootstrap 모달 팝업 창 정의
+    fade ➤ 부드럽게 등장하는 애니메이션 효과
+    id="firstCategoryModal" ➤ JS로 제어할 때 사용되는 식별자
+    tabindex="-1" ➤ 포커스 제어 (모달 바깥 클릭 시 키보드 포커스 방지)
+    aria-labelledby / aria-hidden ➤ 웹 접근성(★장애인 접근성) 속성
+    -->
+
+    <div class="modal-dialog modal-dialog-centered">
+      <!-- modal-dialog-centered ➤ 수직 중앙 정렬 -->
+      <div class="modal-content rounded-3 shadow-sm">
+        <!-- modal-content ➤ 모달의 전체 내용 박스 -->
+
+        <!-- 🧡 모달 헤더 -->
+        <div class="modal-header border-0">
+          <h5 class="modal-title fw-bold" id="firstCategoryModalLabel">1차 카테고리 등록</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+          <!-- 
+          data-bs-dismiss="modal" ➤ Bootstrap 속성
+          ➤ 클릭 시 모달 자동 닫힘
+          -->
+
+        </div>
+
+        <!-- 🧡 모달 바디 (입력폼 영역) -->
+        <div class="modal-body">
+          <form id="firstCategoryForm">
+            <!-- form : 서버로 데이터 전달용 입력 폼 -->
+            <div class="mb-3">
+              <label for="categoryName" class="form-label">카테고리명</label>
+              <input type="hidden" id="categoryCode">
+              <!-- 
+              hidden : 사용자에겐 안 보이지만 JS나 서버전송 시 사용 가능 (예: 수정 시 기존 코드 보관)
+              -->
+
+              <input type="text" class="form-control" id="categoryName" name="categoryName" placeholder="카테고리명을 입력하세요" required>
+              <!-- 
+              class="form-control" ➤ Bootstrap 기본 입력 상자 스타일
+              name="categoryName" ➤ 서버로 전달될 key (Controller나 DTO 필드명과 반드시 일치)
+              placeholder ➤ 입력 예시 문구
+              required ➤ 필수 입력 필드 (비워두면 제출 안 됨)
+              -->
+            </div>
+          </form>
+        </div>
+
+        <!-- 🧡 모달 푸터 (버튼 영역) -->
+        <div class="modal-footer border-0">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+          <button type="button" id="btn_plus_category" class="btn btn-primary">등록</button>
+          <button type="button" id="btn_modify_category" class="btn btn-primary" style="display:none;">수정</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- 💙 2차 카테고리 등록/수정 모달 -->
+  <div class="modal fade" id="sCGModal" tabindex="-1" aria-labelledby="scModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content rounded-3 shadow-sm">
+
+        <!-- 헤더 -->
+        <div class="modal-header border-0">
+          <h5 class="modal-title fw-bold" id="sCMLl">2차 카테고리 등록</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+        </div>
+
+        <!-- 본문 -->
+        <div class="modal-body">
+          <form id="categoryForm">
+
+            <!-- 🩷 1차 카테고리 선택 -->
+            <div class="mb-3">
+              <label for="sMCategory" class="form-label">1차 카테고리 선택</label>
+              <select class="form-select" id="ssMCategory" name="firstCategory">
+                <!-- 
+                name="firstCategory" ➤ 서버로 전달 시 key 이름
+                Controller 또는 DTO에서 firstCategory 변수명과 일치해야 함
+                -->
+                <option value="">-- 1차 카테고리 선택 --</option>
+                <!-- JS로 서버의 1차 카테고리 목록을 append 가능 -->
+              </select>
+            </div>
+
+            <!-- 🩵 2차 카테고리 입력 -->
+            <div class="mb-3">
+              <label for="secondCategoryName" class="form-label">2차 카테고리명</label>
+              <input type="hidden" id="secondCategoryCode">
+              <input type="text" class="form-control" id="sCN" name="sCN" placeholder="2차 카테고리명을 입력하세요" required>
+              <!-- 
+              name="secondCategoryName"
+              ➤ Controller나 DTO의 변수명과 반드시 일치해야 함.
+              예)
+                @RequestParam("secondCategoryName") String name
+                또는 DTO 필드 private String secondCategoryName;
+              -->
+            </div>
+
+          </form>
+        </div>
+
+        <!-- 푸터 -->
+        <div class="modal-footer border-0">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+          <button type="button" id="btn_add_secondCategory" class="btn btn-primary">등록</button>
+          <button type="button" id="btn_e_secondCategory" class="btn btn-primary" style="display:none;">수정</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</th:block>
+                    </div>
+</div>
+
+
+</th:block>
+
+<th:block layout:fragment="script2">
+<script> 
+$(function(){
+
+  $("select[name='cate_code']").on("change",function(){
+    let current=$(this); 
+    
+    let firCategory = current.val(); 
+
+    $.ajax({
+
+      url: '/admin/category/secondpCategoryList/' + firstCategory,// 브라우저 출력
+      type: 'get', 
+      dataType: 'json',
+      success: function(data) {
+        let adCategoryStr = ""; 
+        for(let i=0; i<data.length; i++){
+          adCategoryStr +=`<option value = "${data[i].cate_code}">${data[i].cate_name}</option>`;
+        }  
+
+        $("select[name='s_category']").empty(); 
+       $("select[name='s_category']").append(adCategoryStr);
+      }
+    });  
+
+    // 카테고리 순서 변경 
+    function moveUp($select){
+      $select.find('option:select').each(function(){
+        let $next = $(this).next('option'); 
+        if($next.length){
+          $(this).insertAfter($next);
+        }
+      });
+     
+        // ▲버튼 클릭 시 moveUp 실행
+  $('.btn-up').on('click', function() {
+    // .closest() : 가장 가까운 상위요소 중 조건과 일치하는 요소를 찾음
+    // select를 찾아 moveUp 함수 실행
+    var $select = $(this).closest('.col-auto, .d-flex.flex-column.align-items-stretch, .d-flex.align-items-stretch').find('select');
+    moveUp($select);
+  });
+
+  // ▼버튼 클릭 시 moveDown 실행
+  $('.btn-down').on('click', function() {
+    var $select = $(this).closest('.col-auto, .d-flex.flex-column.align-items-stretch, .d-flex.align-items-stretch').find('select');
+    moveDown($select);
+  });
+
+  
+  
+    } 
+
+      $('#sFcategory').on('click', function() {
+    let orderArr = [];  // 순서를 저장할 배열
+
+    // 각 option의 value(cate_code)를 순서대로 배열에 push
+    $('#sel-main option').each(function() {
+      orderArr.push($(this).val());
+    });
+
+    // AJAX로 서버에 전송
+    $.ajax({
+      url: '/admin/category/categorySort',
+      type: 'post',
+      data: {orderArr : orderArr},  // 전달 데이터 (배열)
+      dataType: 'text',
+      success : function(result) {
+        if(result == "success") {
+          alert("1차카테고리 정렬완료");
+        }
+      },
+      error : function(xhr, status, error) {
+        alert("에러 발생: " + error);
+      }
+    });
+
+    alert('1차 카테고리 순서가 저장:\n' + orderArr.join(', '));
+  });
+
+/* ------------------------- [ 4️⃣ 2차 카테고리 순서 저장 ] ------------------------- */
+  $('#ss-category').on('click', function() {
+    let orderArr = [];
+    $('#sel-sub option').each(function() {
+      orderArr.push($(this).val());
+    });
+    
+    $.ajax({
+        url: '/admin/category/categorySort',
+        type: 'post',
+        data: {orderArr : orderArr},
+        dataType: 'text',
+        success : function(result) {
+          if(result == "success") {
+            alert("2차카테고리 정렬됨");
+          }
+        },
+        error : function(xhr, status, error) {
+          alert("에러 발생: " + error);
+        }
+      });
+
+    alert('2차 카테고리 순서가 저장되었습니다:\n' + orderArr.join(', '));
+  });
+
+
+  /* ------------------------- [ 5️⃣ 1차 카테고리 등록 모달창 ] ------------------------- */
+  const myModal = new bootstrap.Modal('#FCModal', { keyboard: false });
+  // bootstrap.Modal : 부트스트랩의 모달창(팝업창) 객체 생성
+
+  $("button#add-category").on("click", function() {
+    $("#FCMLabel").html("1차 카테고리 등록");
+    $("#btn_plus_category").show();   // 등록 버튼 보이기
+    $("#btn_edit_category").hide();  // 수정 버튼 숨기기
+    myModal.show();                  // 모달창 열기
+  });
+
+  // 1차카테고리 등록 버튼 클릭 시 실행
+  $("button#btn_plus_category").on("click", function() {
+    let categoryName = $("#categoryName").val().trim(); // 입력값 읽기
+    if (categoryName === "") {
+      alert("카테고리명을 입력해주세요.");
+      return;
+    }
+
+    // 등록 AJAX 요청
+    $.ajax({
+      url: "/admin/category/addFirstCategory",
+      type: "POST",
+      data: { cate_name: categoryName },
+      dataType: "text",
+      success: function(result) {
+        if (result == "success") {
+          $("#FCModal").modal("hide"); // 모달 닫기
+          $("#categoryName").val("");             // 입력값 초기화
+          alert("1차카테고리가 등록되었습니다.");
+          location.href = "/admin/category/categorymenu"; // 페이지 새로고침
+        }
+      },
+      error: function(xhr, status, error) {
+        alert("등록 중 오류 발생: " + error);
+      }
+    });
+   });
+
+
+  /* ------------------------- [ 6️⃣ 1차 카테고리 수정 ] ------------------------- */
+   $("button#edit-category").on("click", function() {
+    if ($("#sel-main option:selected").length === 0) {
+      alert("1차 카테고리를 선택하세요.");
+      return;
+    }
+
+    // 선택된 카테고리 정보 모달에 채워넣기
+    $("#categoryName").val($("#sel-main option:selected").text());
+    $("#categoryCode").val($("#sel-main option:selected").val());
+
+    $("#firstCategoryModalLabel").html("1차 카테고리 수정");
+    $("#btn_plus_category").hide();
+    $("#btn_modify_category").show();
+
+    myModal.show(); // 수정용 모달 열기
+   });
+
+   // 수정 버튼 클릭 시 실제 수정 요청
+   $("#btn_modify_category").on("click", function() {
+      $.ajax({
+        url: "/admin/category/editFirstCategory",
+        type: "POST",
+        data: { cate_code : $("#categoryCode").val(),  cate_name: $("#categoryName").val() },
+        dataType: "text",
+        success: function(result) {
+          if (result == "success") {
+            $("#firstCategoryModal").modal("hide");
+            $("#categoryName").val("");
+            alert("카테고리가 수정되었습니다.");
+            location.href = "/admin/category/categorymenu";
+          }
+        },
+        error: function(xhr, status, error) {
+          alert("등록 중 오류 발생: " + error);
+        }
+    });
+   });
+
+
+
+  /* ------------------------- [ 7️⃣ 2차 카테고리 등록/수정/삭제 ] ------------------------- */
+
+   const myModal2 = new bootstrap.Modal('#sCGModal', { keyboard: false });
+
+   // 2차 등록 버튼 클릭 시 실행
+   $("#add-second-category").on("click", function() {
+    $.ajax({
+      url: '/admin/category/firstCategoryList',  // 1차 카테고리 목록 불러오기
+      type: 'get',
+      dataType: 'json',
+      success: function(data) {
+        let firstCategoryStr = "";
+        for(let i=0; i<data.length; i++) {
+          firstCategoryStr += `<option value="${data[i].cate_code}">${data[i].cate_name}</option>`;
+        }
+
+        $("select#ssMCategory").empty();
+        $("select#ssMCategory").append("<option value=''>1차카테고리 선택</option>");
+        $("select#ssMCategory").append(firstCategoryStr);
+
+        $("#btn_plus_secondCategory").show();
+        $("#btn_modify_secondCategory").hide();
+      }
+    });
+    myModal2.show(); // 2차 등록 모달 열기
+   });
+
+
+   // 2차 카테고리 등록 버튼 클릭 시 실행
+   $("button#btn_add_secondCategory").on("click", function() {
+
+    let selMainCategory = $("#sMCategory");
+    if(selMainCategory.val() == "") {
+      alert("1차카테고리명을 선택하세요.");
+      return;
+    }
+
+    let secondCategoryName = $("#sCN").val().trim();
+    if (secondCategoryName === "") {
+      alert("2차카테고리명을 입력해주세요.");
+      return;
+    }
+
+    $.ajax({
+      url: "/admin/category/addSecondCategory",
+      type: "POST",
+      data: { cate_prtcode : $("#selMainCategory").val(), cate_name: $("#sCN").val() },
+      dataType: "text",
+      success: function(result) {
+        if (result == "success") {
+          $("#sCGModal").modal("hide");
+          $("#sCN").val("");
+          alert("2차 카테고리가 등록되었습니다.");
+          location.href = "/admin/category/categorymenu";
+        }
+      },
+      error: function(xhr, status, error) {
+        alert("등록 중 오류 발생: " + error);
+      }
+    });
+   });
+
+
+   // 2차 수정 버튼 클릭 시 — 수정 모달 준비
+   $("#edit-second-category").on("click", function() {
+    let firstCateCode = $("#sel-main option:selected").val();
+    let secondCateCode = $("#sel-sub option:selected").val();
+    let secondCateName = $("#sel-sub option:selected").html();
+
+    if ($("#sel-sub option:selected").length === 0) {
+      alert("1차, 2차 카테고리를 선택하세요.");
+      return;
+    }
+
+    // 수정용 데이터 불러오기
+    $.ajax({
+      url: '/admin/category/firstCategoryList',
+      type: 'get',
+      dataType: 'json',
+      success: function(data) {
+        let firstCategoryStr = "";
+        for(let i=0; i<data.length; i++) {
+          firstCategoryStr += `<option value="${data[i].cate_code}" ${firstCateCode == data[i].cate_code ? 'selected' : ''} >${data[i].cate_name}</option>`;
+        }
+
+        $("#sCGModal").html("2차카테고리 수정");
+        $("select#selMainCategory").empty();
+        $("select#selMainCategory").append("<option value=''>1차카테고리 선택</option>");
+        $("select#selMainCategory").append(firstCategoryStr);
+
+        $("#secondCategoryCode").val(secondCateCode);
+        $("#sCN").val(secondCateName);
+
+        $("#btn_add_secondCategory").hide();
+        $("#btn_e_secondCategory").show();
+
+        myModal2.show();
+      }
+    });
+   });
+
+
+   // 2차 카테고리 수정 저장
+   $("#btn_e_secondCategory").on("click", function() {
+    $.ajax({
+        url: "/admin/category/editSecondCategory",
+        type: "POST",
+        data: { cate_code : $("#secondCategoryCode").val(),
+                cate_name: $("#sCN").val(),
+                cate_prtcode :  $("#selMainCategory").val()},
+        dataType: "text",
+        success: function(result) {
+          if (result == "success") {
+            $("#sCGModal").modal("hide");
+            $("#sCN").val("");
+            $("#secondCategoryCode").val("");
+            alert("2차카테고리가 수정완료.");
+            location.href = "/admin/category/categorymenu";
+          }
+        },
+        error: function(xhr, status, error) {
+          alert("등록 중 오류 발생: " + error);
+        }
+    });
+   });
+
+
+   // 1차 카테고리 삭제
+   $("button#delete-category").on("click", function() {
+    if($("select#sel-main option:selected").length == 0) {
+      alert("1차 카테고리 선택하세요.");
+      return;    
+    }
+
+    let cate_code = $("select#sel-main option:selected").val();
+
+    $.ajax({
+      url: '/admin/category/deleteCategory',
+      type: 'post',
+      data: {cate_code : cate_code},
+      dataType: 'text',
+      success : function(result) {
+        if(result == "success") {
+          alert("1차 카테고리 삭제됨");
+          location.href = "/admin/category/categorymenu";
+        }
+      },
+      error: function(xhr, status, error) {
+        alert("삭제 중 오류 발생: " + error);
+      }
+    });
+   });
+
+
+   // 2차 카테고리 삭제
+   $("button#delete-s-category").on("click", function() {
+    if($("select#sel-sub option:selected").length == 0) {
+      alert("2차 카테고리 선택하세요.");
+      return;    
+    }
+
+    let cate_code = $("select#sel-sub option:selected").val();
+
+    $.ajax({
+      url: '/admin/category/deleteCategory',
+      type: 'post',
+      data: {cate_code : cate_code},
+      dataType: 'text',
+      success : function(result) {
+        if(result == "success") {
+          alert("2차 카테고리 삭제완료");
+          location.href = "/admin/category/categorymenu";
+        }
+      },
+      error: function(xhr, status, error) {
+        alert("삭제 중 오류 발생: " + error);
+      }
+    });
+   });
+
+}); // ✅ jQuery ready 끝
+});
+
+
+</script>
+</th:block>
+
+</html>
+
+
+
+
+
+
+
+
+

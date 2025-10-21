@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">    <!-- 이 한 줄이 레이아웃페이지와 연결해주는 의미 마치 상속(적용)되는 것 처럼 됨.  -->
+
+
+	<th:block layout:fragment="css">
+		<sytle>
+			<!-- 스타일리스 -->
+		
+		</sytle>
+		</th:block>
+
+	<th:block layout:fragment="script1">
+		<script>
+			// 자바스크립트 1
+		</script>
+	</th:block>
+	
+	 <th:block layout:fragment="content">
+	 
+	 	<h3>sub2 세번째 페이지</h3>
+	 	
+	 	
+	 <th:block layout:fragment="script2">	
+	 	<script>
+	 	 	// 스크립트2
+	 	</script>
+	</th:block>	 
+
+   </th:block> 
+
+
+</html>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.coreflow.shop.product.ProductMapper">
+
+	<select id="getProductList" resultType="com.coreflow.shop.common.dto.ProductDTO">
+	
+		select 
+			pro_num,
+			cate_code,
+			pro_name,
+			pro_price,
+			pro_discount,
+			pro_publisher,
+			pro_summary,
+			pro_up_folder,
+			pro_img,
+			pro_amount,
+			pro_buy,
+			pro_review,
+			pro_date,
+			pro_updatedate 
+		from 
+			products
+		where 
+			cate_code = #{cate_code}
+		and
+			pro_buy = 'Y'
+		limit 
+			#{cri.pageStart}, #{cri.perPageNum}
+	
+	</select>
+	
+	<select id="getProductListCount" resultType="int">
+	
+		select 
+			count(pro_num)
+		from
+			products
+		where 
+			cate_code = #{cate_code}
+		and
+			pro_buy = 'Y'
+	
+	</select>
+	
+	<select id="getRecommendList" resultType="com.coreflow.shop.common.dto.ProductDTO">
+	
+    	select 	
+    		pro_num,
+			cate_code,
+			pro_name,
+			pro_price,
+			pro_discount,
+			pro_publisher,
+			pro_summary,
+			pro_up_folder,
+			pro_img,
+			pro_amount,
+			pro_buy,
+			pro_review,
+			pro_date,
+			pro_updatedate 
+    	from 
+    		products
+    	order by 
+    		pro_num desc
+    	limit 15
+    
+	</select>
+
+</mapper>

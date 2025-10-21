@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.coreflow.shop.member.MemberMapper">
+
+	<insert id="join" parameterType="com.coreflow.shop.common.dto.MemberDTO">
+		insert into
+			members
+			(
+			mbsp_id,
+			mbsp_name,
+			mbsp_email,
+			mbsp_password,
+			mbsp_zipcode,
+			mbsp_address,
+			mbsp_addressdetail,
+			mbsp_phone,
+			mbsp_gender,
+			mbsp_receive,
+			mbsp_birthdate
+			)
+		values
+			(
+			#{mbsp_id},
+			#{mbsp_name},
+			#{mbsp_email},
+			#{mbsp_password},
+			#{mbsp_zipcode},
+			#{mbsp_address},
+			#{mbsp_addressdetail},
+			#{mbsp_phone},
+			#{mbsp_gender},
+			#{mbsp_receive},
+			#{mbsp_birthdate}
+			)
+	</insert>
+	
+	<select id="idCheck" resultType="String" parameterType="String">
+	
+		select 
+			mbsp_id 
+		from 
+			members 
+		where 
+			mbsp_id = #{mbsp_id}		
+	</select>
+	
+	
+	<select id="login" resultType="com.coreflow.shop.common.dto.MemberDTO" parameterType="String">
+
+		select 
+			mbsp_id,
+			mbsp_name,
+			mbsp_email,
+			mbsp_password,
+			mbsp_zipcode,
+			mbsp_address,
+			mbsp_addressdetail,
+			mbsp_phone,
+			mbsp_gender,
+			mbsp_receive,
+			mbsp_birthdate
+		from 
+			members 
+		where
+			mbsp_id = #{mbsp_id}	
+	</select>
+	
+	<select id="modify" resultType="com.coreflow.shop.common.dto.MemberDTO" parameterType="String">
+
+		select 
+			mbsp_id,
+			mbsp_name,
+			mbsp_email,
+			mbsp_password,
+			mbsp_zipcode,
+			mbsp_address,
+			mbsp_addressdetail,
+			mbsp_phone,
+			mbsp_gender,
+			mbsp_receive,
+			mbsp_birthdate,
+			mbsp_datesub, 
+			mbsp_updatedate 
+		from 
+			members
+		where 
+			mbsp_id = #{mbsp_id}		
+	</select>
+	
+	
+	<update id="modify_save" parameterType="com.coreflow.shop.common.dto.MemberDTO">
+	
+		update 
+			members
+		set 
+			mbsp_email = #{mbsp_email}, 
+			mbsp_zipcode = #{mbsp_zipcode}, 
+			mbsp_address = #{mbsp_address}, 
+			mbsp_addressdetail = #{mbsp_addressdetail}, 
+			mbsp_phone = #{mbsp_phone},
+			mbsp_receive = #{mbsp_receive},
+			mbsp_updatedate = now()
+		where 
+			mbsp_id = #{mbsp_id}
+	</update>
+
+
+	<select id="idsearch" parameterType="Map" resultType="String">
+	
+	select 
+		mbsp_id 
+	from 
+		members
+	where 
+		mbsp_name = #{mbsp_name} 
+	and 
+		mbsp_email = #{mbsp_email}
+	
+	</select>
+	
+	<select id="pwtemp_comfirm" parameterType="Map" resultType="String">
+	
+	select 
+		mbsp_email 
+	from 
+		members
+	where 
+		mbsp_id = #{mbsp_id} and mbsp_email = #{mbsp_email}
+	
+	</select>
+	
+	
+	<update id="pwchange" parameterType="Map">
+	
+	update 
+		members 
+	set 
+		mbsp_password = #{mbsp_password}
+	where 
+		mbsp_id  = #{mbsp_id}
+		
+	</update>
+	
+	<delete id="withdrawal" parameterType="com.coreflow.shop.common.dto.MemberDTO">
+	
+	delete from 
+		members 
+	where 
+		mbsp_id  = #{mbsp_id}
+	
+	</delete>
+	
+	
+	
+	
+	
+
+
+</mapper>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="menu">
+<head>
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 30px;
+    }
+
+	/* 메뉴 카드에만 hover 적용 */
+	.menu-card {
+	  background: #fff;
+	  border-radius: 16px;
+	  padding: 0;
+	  margin-bottom: 30px;
+	  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+	  transition: transform 0.2s;
+	}
+	
+	.menu-card:hover {
+	  transform: translateY(-3px);
+	}
+	
+	/* 일반 카드에는 hover 효과 없음 */
+	.card:not(.menu-card) {
+	  transform: none;
+	  transition: none;
+	}
+
+
+    .card-header {
+      background: #f1f3f5;
+      border-bottom: none;
+      border-radius: 16px 16px 0 0;
+      padding: 16px 24px;
+      font-weight: bold;
+      font-size: 1.2rem;
+      color: #333;
+    }
+
+    .list-group {
+      border-radius: 0 0 16px 16px;
+      overflow: hidden;
+    }
+
+    .list-group-item {
+      border: none;
+      padding: 14px 20px;
+      font-weight: 600;
+      transition: background 0.3s, color 0.3s;
+      cursor: pointer;
+      background-color: #fff;
+      color: #333;
+    }
+
+    .list-group-item:hover {
+      background-color: #000;
+      color: #fff;
+    }
+
+    .list-group-item-action {
+      text-decoration: none;
+      display: block;
+    }
+
+    /* 제목 */
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: bold;
+    }
+
+  </style>
+</head>
+
+	<div class="card menu-card">
+	  <div class="card-header">
+	    <h5 class="card-title mb-0">마이페이지</h5>
+	  </div>
+	  <div class="list-group list-group-flush">
+      <a href="/member/pwchange" class="list-group-item list-group-item-action">비밀번호 변경</a>
+      <a href="/order/order_manage" class="list-group-item list-group-item-action">주문 관리</a>
+      <a href="/order/review_manage" class="list-group-item list-group-item-action">리뷰 관리</a>
+      <a href="/member/withdrawal" class="list-group-item list-group-item-action">회원 탈퇴</a>
+    </div>
+  </div>
+</th:block>
+</html>

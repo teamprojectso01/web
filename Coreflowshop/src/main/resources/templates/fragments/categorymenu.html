@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="category">
+
+<!-- 1차 카테고리 -->
+<ul class="nav justify-content-center">
+  <li class="nav-item dropdown" th:each="menu : ${firstCategoryList}">
+    <a class="nav-link" href="#" th:data-cate_code="${menu.cate_code}" th:text="${menu.cate_name}"></a>
+    <!-- 2차 카테고리 -->
+    <ul class="dropdown-menu" th:id="'subCategory_' + ${menu.cate_code}"></ul>
+  </li>
+</ul>
+
+<style>
+  /* 1차 카테고리 */
+  .nav-item.dropdown > a.nav-link {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #000; /* 기본 글씨 색상 통일 */
+    padding: 0.5rem 1rem;
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+  .nav-item.dropdown > a.nav-link:hover {
+    color: #007bff; /* hover 강조 색상 */
+  }
+
+  /* 2차 카테고리 */
+  .dropdown-menu {
+    display: none;
+    position: absolute;
+    background-color: #212529; /* 어두운 배경 */
+    padding: 0.5rem 0;
+    margin-top: 0;
+    min-width: 12rem;
+    border-radius: 8px;
+    box-shadow: 0 0.3rem 0.6rem rgba(0,0,0,0.25);
+    z-index: 1000;
+  }
+
+  .nav-item.dropdown:hover > .dropdown-menu {
+    display: block;
+  }
+
+  /* 2차 카테고리 아이템 */
+  .dropdown-menu .dropdown-item {
+    color: #f8f9fa; /* 밝은 글씨 */
+    padding: 0.5rem 1rem;
+    font-size: 0.95rem;
+    transition: background-color 0.3s, color 0.3s;
+  }
+
+  .dropdown-menu .dropdown-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #ffc107; /* hover 강조 색상 */
+  }
+
+  /* 카테고리 전체 높이와 그림자 통일 */
+  .nav-item.dropdown {
+    position: relative;
+  }
+</style>
+
+<script>
+$(document).ready(function() {
+  // 1차 메뉴 hover 시 2차 카테고리 불러오기
+  $("li.nav-item.dropdown").hover(function() {
+    let firstCategoryCode = $(this).find("a.nav-link").data("cate_code");
+
+    // Ajax 호출
+    $.ajax({
+      url: '/category/secondCategoryList/' + firstCategoryCode,
+      type: 'get',
+      dataType: 'json',
+      success: function(data) {
+        let subCategoryStr = "";
+        for(let i=0; i<data.length; i++) {
+          subCategoryStr += `<li><a class="dropdown-item" href="#" data-subCategoryCode="${data[i].cate_code}">${data[i].cate_name}</a></li>`;
+        }
+        $("#subCategory_" + firstCategoryCode).empty().append(subCategoryStr);
+      }
+    });
+  });
+
+  // 2차 카테고리 클릭 시 이동
+  $("ul.dropdown-menu").on("click", "a.dropdown-item", function(e) {
+    e.preventDefault();
+    let cate_code = $(this).data("subcategorycode");
+    let cate_name = encodeURIComponent($(this).text());
+    location.href = `/product/pro_list?cate_name=${cate_name}&cate_code=${cate_code}`;
+  });
+});
+</script>
+
+</th:block>
+</html>

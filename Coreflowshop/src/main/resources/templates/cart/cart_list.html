@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
+
+<head>
+  <style>
+    body {
+      background-color: #f8f9fa;
+      color: #333;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 30px 0;
+    }
+
+	.fw-bold {
+		font-size: 35px;
+	}
+    /* 카드 스타일 */
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 30px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+
+    .card-body {
+      padding: 24px 16px;
+    }
+
+    /* 테이블 */
+    .table th, .table td {
+      vertical-align: middle;
+      padding: 20px 15px;
+      text-align: center;
+    }
+
+    .table thead th { 
+      color: #333;
+      border-bottom: 2px solid #ccc;
+      font-size: 1rem;
+    }
+
+    .price, .unitprice {
+      color: #000;
+      font-weight: 600;
+    }
+
+    /* 총금액 박스 */
+    .cart_total_box {
+      background: #e9ecef;
+      padding: 8px 16px; /* 높이 축소 */
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      display: inline-block;
+      font-weight: bold;
+      font-size: 1rem;
+    }
+
+    /* 버튼 */
+    .btn-primary {
+      background: #000;
+      border: none;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 12px;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+    .btn-primary:hover {
+      background: #333;
+    }
+
+    .btn-outline-primary {
+      border: 2px solid #000;
+      color: #000;
+      background-color: transparent;
+      border-radius: 12px;
+      font-weight: 600;
+    }
+    .btn-outline-primary:hover {
+      background: #000;
+      color: #fff;
+    }
+
+    /* 상품 이미지 */
+    .product-img {
+      border-radius: 8px;
+    }
+
+    /* 체크박스 중앙정렬 */
+    input[type="checkbox"] {
+      transform: scale(1.2);
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 10px;
+    }
+
+    .table {
+      margin-bottom: 0;
+    }
+
+  </style>
+</head>
+
+<th:block layout:fragment="content">
+
+  <div class="row">
+    <div class="col text-center mb-4 mt-3">
+      <h2 class="fw-bold">CART</h2>
+      <p class="text-muted">Your shopping cart items</p>
+    </div>
+  </div>
+
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      <div class="card">
+        <div class="card-body">
+          <form id="cartForm" method="post" action="/cart/cart_sel_delete">
+            <table class="table align-middle text-center">
+              <thead class="table-light">
+                <tr>
+                  <th style="width: 10%"><input type="checkbox" id="checkAll"><br>전체선택</th>
+                  <th style="width: 20%">상품이미지</th>
+                  <th style="width: 20%">상품이름</th>
+                  <th style="width: 15%">가격</th>
+                  <th style="width: 15%">수량</th>
+                  <th style="width: 20%">합계</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr th:each="item : ${cart_list}">
+                  <td><input type="checkbox" name="check" th:value="${item['pro_num']}"></td>
+                  <td>
+                    <img class="img-fluid product-img" style="max-width:100px; max-height:100px;" 
+                         th:src="${'/cart/image_display?dateFolderName=' + item.pro_up_folder + '&fileName=s_' + item.pro_img}">
+                  </td>
+                  <td th:text="${item['pro_name']}"></td>
+                  <td class="price" th:data-price="${item['pro_price']}" 
+                      th:text="${#numbers.formatInteger(item['pro_price'], 3, 'COMMA') + '원'}"></td>
+                  <td>
+                    <div class="d-flex justify-content-center align-items-center gap-2">
+                      <input type="number" name="btn_cart_amount" th:value="${item['cart_amount']}" min="1" class="form-control text-center" style="width:70px;">
+                      <button type="button" class="btn btn-outline-primary btn-sm" name="btn_quantity_change" th:data-pro_num="${item['pro_num']}" style="white-space: nowrap;">변경</button>
+                    </div>
+                  </td>
+                  <td class="unitprice" th:data-unitprice="${item['unitprice']}" 
+                      th:text="${#numbers.formatInteger(item['unitprice'], 3, 'COMMA') + '원'}"></td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="6" class="text-end">
+                    <div th:if="${cart_total_price != null}" class="cart_total_box" 
+                         th:text="'총금액 : ' + ${#numbers.formatInteger(cart_total_price, 3, 'COMMA') + '원'}"></div>
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="6" class="text-center text-muted py-4" th:unless="${cart_total_price != null}" th:text="'장바구니에 담긴 상품이 없습니다.'"></td>
+                </tr>
+              </tfoot>
+            </table>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mt-4">
+    <div class="col-lg-10 mx-auto d-flex justify-content-between">
+      <div class="btn-group">
+        <button type="button" class="btn btn-outline-primary" id="btn_sel_delete">선택삭제</button>
+        <button type="button" class="btn btn-outline-primary" id="btn_cart_empty">장바구니 비우기</button>
+      </div>
+      <div class="btn-group">
+        <button type="button" class="btn btn-primary" id="btn_order_info">주문하기</button>
+        <button type="button" class="btn btn-outline-primary" id="btn_shopping">계속 쇼핑하기</button>
+      </div>
+    </div>
+  </div>
+
+</th:block>
+
+
+<th:block layout:fragment="script2">
+
+ <script th:inline="javascript">
+
+  $(document).ready(function() {
+    // 장바구니 비우기
+    $("#btn_cart_empty").on("click", function() {
+      if(confirm("장바구니를 비우겠습니까?")) {
+        location.href = "/cart/cart_empty";
+      }
+    });
+
+  $("#checkAll").on("click", function() {
+    $("input[name='check']").prop("checked", this.checked);
+    });
+
+  $("input[name='check']").on("click", function() {
+    $("#checkAll").prop("checked", true)
+
+    $("input[name='check']").each(function() {
+      if(!$(this).is(":checked")) {
+        $("#checkAll").prop("checked", false);
+      }
+    });
+  });
+
+   // 선택삭제
+  $("#btn_sel_delete").on("click", function() {
+    if(confirm("선택된 상품을 삭제하시겠습니까?")) {
+      $("#cartForm").submit();
+    }
+  });
+
+  // 수량변경
+  $("button[name='btn_quantity_change']").on("click", function() {
+  
+    let cur_tr = $(this).closest("tr"); 
+    let tfoot_first_tr = $("table tfoot tr:first");
+  
+    let pro_num = $(this).data("pro_num");
+    let cart_amount = $(this).parent().find("input[name='btn_cart_amount']").val();
+
+    $.ajax({
+        url: "/cart/cart_quantity_change_2",
+        type: "post",
+        data: {pro_num: pro_num, cart_amount: cart_amount},
+        success: function(result) {
+          if(result == "success") {
+
+           // 가격 * 수량
+           let unitprice = cur_tr.find("td.price").data("price") * cart_amount ; 
+               cur_tr.find("td.unitprice")
+               .data("unitprice", unitprice)
+               .html(unitprice + " 원");
+
+           let total_price = 0;
+           $("td.unitprice").each(function() {
+             total_price += parseInt($(this).data("unitprice"));
+           })
+
+            console.log("총금액", total_price);
+
+            tfoot_first_tr.find("div.cart_total_box").html("총금액 : " + total_price + " 원");
+          }}
+        });
+   });
+
+   // 주문하기
+   $("#btn_order_info").on("click",function() {
+    location.href = "/order/order_info?type=cart";
+   });
+
+    // 계속 쇼핑하기
+   $("#btn_shopping").on("click", function() {
+    location.href = "/";
+   });
+   
+  });
+</script>
+
+</th:block>
+
+</html>

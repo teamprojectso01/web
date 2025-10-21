@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.coreflow.shop.order.OrderMapper">
+
+	<insert id="order_insert" useGeneratedKeys="true" keyProperty="ord_code">
+		
+		insert into orders
+			(
+			mbsp_id,
+			ord_name,
+			ord_addr_zipcode,
+			ord_addr_basic,
+			ord_addr_detail,
+			ord_tel,
+			ord_mail,
+			ord_price
+			)
+		values
+			(
+			#{mbsp_id},
+			#{ord_name},
+			#{ord_addr_zipcode},
+			#{ord_addr_basic},
+			#{ord_addr_detail},
+			#{ord_tel},
+			#{ord_mail},
+			#{ord_price}
+			)
+		
+	</insert>
+	
+	<insert id="order_item_insert">
+	
+		insert into order_items
+			(
+			ord_code,
+			pro_num,
+			oi_quantity,
+			oi_price
+			)
+		select 
+			#{ord_code},
+			c.pro_num,
+			c.cart_amount,
+			p.pro_price
+		from 
+			cart c
+		inner join
+			products p
+		on
+			c.pro_num = p.pro_num
+		where
+			mbsp_id = #{mbsp_id}
+	
+	</insert>
+	
+	<select id="order_result" resultType="map">	
+	
+		select 
+			o.ord_code,
+			p.pro_name,
+			p.pro_num, 
+			p.pro_up_folder, 
+			p.pro_img,
+			o.oi_price, 
+			o.oi_quantity,
+			pa.payment_status
+		from 
+			order_items o 
+		inner join 
+			products p 
+		on 
+			o.pro_num = p.pro_num
+		inner join 
+			payment pa
+		on 
+			o.ord_code = pa.ord_code
+		where 
+			o.ord_code = #{ord_code}
+			
+	</select>
+	
+</mapper>

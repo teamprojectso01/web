@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{admin/layouts/ad_layout}">
+
+	<th:block layout:fragment="script1">
+	
+		<script>
+			// 날짜 설정 함수
+			function setDateRange(range) {
+				const today = new Date();  // 날짜객체.
+				const startInput = document.getElementById('start_date'); // 시작날짜 태그를 참조
+				const endInput = document.getElementById('end_date'); // 종료날짜 태그를 참조
+				
+				let startDate, endDate;
+	
+				switch (range) {
+					case 'today':
+						startDate = new Date(today);
+						endDate = new Date(today);
+						break;
+					case 'week':
+						startDate = new Date(today);
+						startDate.setDate(today.getDate() - 6);
+						endDate = new Date(today);
+						break;
+					case 'month':
+						startDate = new Date(today);
+						startDate.setMonth(today.getMonth() - 1);
+						endDate = new Date(today);
+						break;
+				}
+	
+				// 포맷팅하여 input에 값 설정
+				startInput.value = startDate ? formatDate(startDate) : '';
+				endInput.value = endDate ? formatDate(endDate) : '';
+			}
+	
+			// 날짜를 yyyy-MM-dd 형식으로 포맷
+			function formatDate(date) {
+				const year = date.getFullYear();
+				const month = String(date.getMonth() + 1).padStart(2, '0');
+				const day = String(date.getDate()).padStart(2, '0');
+				return `${year}-${month}-${day}`;
+			}
+
+			// 설정된 값을 초기화(?)
+			function initializeSearchForm() {
+				// Get form elements by their IDs or names
+				const searchType = document.querySelector('select[name="searchType"]');
+				const keyword = document.querySelector('input[name="keyword"]');
+				const genderType = document.querySelector('select[name="genderType"]');
+				const period = document.querySelector('select[name="period"]');
+				const startDate = document.getElementById('start_date');
+				const endDate = document.getElementById('end_date');
+	
+				// Reset dropdowns to the default options
+				if (searchType) searchType.value = ''; // Default to "검색종류 선택"
+				if (period) period.value = 'mbsp_datesub'; // Default to "주문일"
+				if (genderType) genderType.value = '';
+
+				// Clear text input fields
+				if (keyword) keyword.value = '';
+				if (startDate) startDate.value = '';
+				if (endDate) endDate.value = '';
+
+				// Reset radio buttons to default (first radio button is checked)
+					
+			}
+			
+		</script>
+		
+	</th:block>
+
+	<th:block layout:fragment="content">
+	      
+	  <div class="container mt-5">
+		<div class="row">
+			<div class="col">
+				<div class="card card-primary">
+					<div class="card-header">
+					  <h3 class="card-title">회원정보관리</h3>
+					</div>
+					
+					<!-- /.card-header -->
+					<!-- list start -->
+					<div class="card-body">
+					
+						<!-- search form start -->
+			<form action="/admin/member/member_list" method="get">
+					 <div class="row">
+					 	<div class="col-2">회원검색</div>	
+						<div class="col-2">												
+							<select name="searchType" class="form-control">
+								<option selected>검색종류 선택</option>
+								<option value="n">회원명</option>
+								<option value="i">회원아이디</option>
+								<option value="p">연락처</option>
+								<option value="ni">회원명 or 회원아이디</option>
+							</select>								
+						</div>					
+						<div class="col-4">
+							<input type="text" name="keyword" class="form-control" placeholder="입력">
+						</div>
+					 </div>											
+				
+				<div class="row mt-2">
+				<div class="col-2">성별</div>
+					<div class="col-2">
+						<div class="form-group">
+							<select name="genderType" class="form-control">
+								<option selected>성별</option>
+								<option value="F">여성</option>
+								<option value="M">남성</option>	
+							</select>							
+						</div>
+					</div>
+				</div>
+
+				<div class="row mt-2">
+					<div class="col-2">날짜</div>
+					<div class="col-2">
+						<div class="form-group">
+							<select name="period" class="form-control">
+								<option selected>날짜</option>
+								<option value="join_date" th:selected="${'mbsp_datesub'} == ${mbsp_datesub}">가입일</option>
+								<option value="login_date" th:selected="${'mbsp_lastlogin'} == ${mbsp_lastlogin}">최근접속일</option>	
+							</select>							
+						</div>
+					</div>
+					<div class="col-3">
+						<input type="date" name="start_date" id="start_date" style="width: auto;" th:value="${start_date}">
+						<input type="date" name="end_date" id="end_date" style="width: auto;" th:value="${end_date}">
+					</div>
+					<div class="col-5">
+						<button type="button" class="btn btn-sm btn-outline-info" onclick="setDateRange('today')">오늘</button>
+						<button type="button" class="btn btn-sm btn-outline-info" onclick="setDateRange('week')">일주일</button>
+						<button type="button" class="btn btn-sm btn-outline-info" onclick="setDateRange('month')">1개월</button>
+					</div>
+				</div>
+				<div class="row mt-2">
+					<div class="col text-center">
+						<button type="submit" class="btn btn-primary">검색</button>
+						<button type="button" class="btn btn-outline-primary">초기화</button>
+					</div>
+				</div>
+			</form>
+			
+			
+				<div class="row mt-4">
+					<div class="col">
+						<button type="button" class="btn btn-outline-danger" id="btn_sel_delete_1">선택삭제</button>
+					</div>
+				</div>	
+				
+				<div class="row mt-2">
+					<div class="col">
+					 <form name="frm_member_list" id="frm_member_list" method="post" action="/admin/member/pro_sel_delete_2">
+						<table class="table table-bordered">
+						  <thead>
+							<tr>
+							  <th style="width: 5%"><input type="checkbox" id="checkAll"></th>
+							  <th style="width: 10%">회원명</th>
+							  <th style="width: 5%">성별</th>
+							  <th style="width: 10%">아이디</th>
+							  <th style="width: 10%">최근로그인</th>
+							  <th style="width: 10%">연락처</th>
+							  <th style="width: 10%">메일주소</th>
+ 							  <th style="width: 10%">가입일시</th>
+  							  <th style="width: 5%">포인트</th>
+							  
+							</tr>
+						  </thead>
+						  <tbody>
+							<tr th:each= "MemberDTO : ${member_list}">
+							  <td>
+								<input type="checkbox" name="check" th:value="${MemberDTO.mbsp_id}">
+							  </td>
+							  <td>[[${MemberDTO.mbsp_name}]]</td>
+							  <td>[[${MemberDTO.mbsp_gender}]]</td>
+							  <td>[[${MemberDTO.mbsp_id}]]</td>
+							  <td>[[${#dates.format(MemberDTO.mbsp_lastlogin, 'yyyy-MM-dd HH:mm:ss')}]]</td>
+							  <td>[[${MemberDTO.mbsp_phone}]]</td>
+							  <td>[[${MemberDTO.mbsp_email}]]</td>
+							  <td>[[${#dates.format(MemberDTO.mbsp_datesub, 'yyyy-MM-dd HH:mm:ss')}]]</td>
+							  <td>[[${MemberDTO.mbsp_point}]]</td>
+							  
+							  <td>
+								<button type="button" class="btn btn-block btn-sm btn-outline-primary" th:data-mbsp_id="${MemberDTO.mbsp_id}" name="btn_member_edit">수정</button>
+								<button type="button" class="btn btn-block btn-sm btn-outline-primary" th:data-mbsp_id="${MemberDTO.mbsp_id}" name="btn_member_del">삭제</button>
+							  </td>
+							</tr>
+							
+						  </tbody>
+						</table>
+					</form>
+					
+					<!-- 페이징및검색 파라미터 정보 : 현재 목록상태를 작업(수정,삭제)을 하고 돌아왔을 때 유지. -->
+					<form id="criteriaForm" action="" method="get">
+						<!-- 6개은 페이징,검색파라미터 -->
+						<input type="hidden" name="page" id="page" th:value="${pageMaker.cri.page}" />
+						<input type="hidden" name="perPageNum" id="perPageNum" th:value="${pageMaker.cri.perPageNum}" />
+						<input type="hidden" name="searchType" id="searchType" th:value="${pageMaker.cri.searchType}" />
+						<input type="hidden" name="keyword" id="keyword" th:value="${pageMaker.cri.keyword}" />
+						<input type="hidden" name="genderType" id="genderType" th:value="${genderType}" />
+						<input type="hidden" name="period" id="period" th:value="${period}" />
+						<input type="hidden" name="start_date" id="start_date" th:value="${start_date}" />
+						<input type="hidden" name="end_date" id="end_date" th:value="${end_date}" />
+						<!-- 수정,삭제 회원아이디 -->
+						<input type="hidden" name="mbsp_id" id="mbsp_id">
+					</form>
+				</div>
+				</div>	 
+			</div>
+
+					<div class="card-footer clearfix">
+						<nav aria-label="Page navigation example">
+							<ul class="pagination">
+							<!-- 이전표시여부 Previous  pageMaker.getPrev() -->
+							<th:block th:if="${pageMaker.prev}">
+								<li class="page-item"><a class="page-link movepage" th:href="${pageMaker.startPage - 1}">Previous</a></li>
+							</th:block>
+								<!--  페이지번호 출력.  1  2  3  4  5 -->
+								<th:block th:each="num : ${#numbers.sequence(pageMaker.startPage, pageMaker.endPage)}">
+								<li class="page-item" th:classappend="${pageMaker.cri.page == num ? 'active' : ''}">
+									<a class="page-link movepage" th:href="${num}" th:text="${num}"></a>
+								</li>        
+								</th:block>
+							
+							<!--  다음표시여부 Next -->
+							<th:block th:if="${pageMaker.next}">
+								<li class="page-item"><a class="page-link movepage" th:href="${pageMaker.endPage + 1}">Next</a></li>
+							</th:block>
+							</ul>
+						</nav>
+					</div>
+				 </div>
+			</div>
+		</div>
+	  </div>
+
+
+
+	  
+	    
+	</th:block>
+
+	<th:block layout:fragment="script2">
+		<script>
+
+			$(document).ready(function() {
+	
+				// 제목행 checkbox 클릭.  id="checkAll"
+				let isCheck = true; // 
+				$("#checkAll").on("click", function() {
+					// console.log("제목행 체크박스");
+					// this.checked : 제목행의 체크박스 상태
+					// 데이터행의 모든 체크박스 상태를 제목행의 체크상태로 적용
+					$("input[name='check']").prop("checked", this.checked);
+					isCheck = this.checked;					
+				});
+
+				// 데이터행 checkbox 클릭
+				$("input[name='check']").on("click", function() {
+					// 데이터행의 체크박스가 클릭이되면, 제목행 체크박스 상태를 데이타행의 체크박스 상태로 설정.
+					$("#checkAll").prop("checked", this.checked);
+
+					// 데이터행 checkbox가 모두 선택되어 있는 경우 제목행 체크박스 선택
+					//                    하나라도 선택되어 있지 않는 경우 제목행 체크박스 선택해제
+					$("input[name='check']").each(function() {
+						if(!$(this).is(":checked")) { // 데이터행이 체크가 안되어있는 경우 제목행 체크상태를 해제
+							$("#checkAll").prop("checked", false);
+						}
+					});
+				});
+
+				/*
+						1)location.href = "url주소" : 단일삭제
+						2)<form>태그사용
+						3)jquery ajax지원메서드 사용
+				*/
+
+				// 1)ajax용. 선택삭제1 클릭.  id="btn_sel_delete"
+				$("#btn_sel_delete_1").on("click", function() {
+					
+					if(!confirm("선택하신 회원을 삭제하겠습니까?")) return;
+					
+					//console.log("선택삭제");
+					if($("input[name='check']:checked").length == 0) {
+						alert("삭제 할 회원을 체크하세요.");
+						return;
+					}
+
+					
+					// 체크된 회원의 아이디 확인
+					$("input[name='check']:checked").each(function() {
+						pro_num_arr.push($(this).val());
+					});
+
+					//console.log("선택상품코드", pro_num_arr);
+
+					// 스프링부트 주소 호출.
+					$.ajax({
+						url: '/admin/product/pro_sel_delete_1',
+						type: 'post',
+						data : {pro_num_arr : pro_num_arr},
+						dataType: 'text',
+						success: function(result) {
+							if(result == 'success') {
+								alert("체크된 상품이 삭제되었습니다.");
+								location.href = "/admin/member/member_list";
+							}
+						}
+					});
+
+					
+				});
+			
+				// id="criteriaForm"
+				let criteriaForm = $("#criteriaForm");
+				
+				
+				// 삭제버튼클릭.  name="btn_member_del"
+				$("button[name='btn_member_del']").on("click", function() {
+					
+					if(!confirm("삭제 하겠습니까?")) return;
+
+					let mbsp_id = $(this).data("mbsp_id");
+
+					// <form id="criteriaForm"> 사용
+					$("#mbsp_id").val(mbsp_id);
+				
+					criteriaForm.attr("method", "get");
+					criteriaForm.attr("action", "/admin/member/member_delete");
+					// 아래 구문을 주석을 걸고, 브라우저에서 criteriaForm 폼의 내용이 변경되는 것을 확인하고, 전송작업
+					criteriaForm.submit();
+				});
+
+				// 페이지번호 클릭
+				$("a.movepage").on("click", function(e) {
+					
+					e.preventDefault();
+					let page = $(this).attr("href");
+					criteriaForm.find("input[name='page']").val(page);
+
+					criteriaForm.attr("action", "/admin/member/member_list");
+					criteriaForm.attr("method", "get");
+
+					criteriaForm.submit();
+				});
+				
+
+				
+				// 회원 수정버튼 클릭  name="btn_member_edit"
+				$("button[name='btn_member_edit']").on("click", function() {
+					
+					let mbsp_id = $(this).data("mbsp_id");
+					
+					// <form id="criteriaForm"> 사용
+					$("#mbsp_id").val(mbsp_id);
+					
+					criteriaForm.attr("method", "get");
+					criteriaForm.attr("action", "/admin/member/member_edit")
+					
+					// 아래 구문을 주석을 걸고, 브라우저에서 criteriaForm 폼의 내용이 변경되는 것을 확인하고, 전송작업
+					criteriaForm.submit();
+					
+				});
+		
+				
+	
+			}); // ready event end
+			
+				document.getElementById('btn_search_init').addEventListener('click', () => {
+				initializeSearchForm();
+				alert('Search form has been reset.');
+			});
+	
+		</script>
+
+	</th:block>
+</html>

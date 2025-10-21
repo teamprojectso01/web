@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.coreflow.shop.admin.payment.AdminPaymentMapper">
+
+	<update id="payment_status_change">
+	
+		update 
+			payment
+		set 
+			payment_status = #{payment_status}
+		where 
+			ord_code = #{ord_code}
+
+	</update>
+	
+	<select id="payment_info" resultType="com.coreflow.shop.common.dto.PaymentDTO">
+	
+		select 
+			payment_id,
+			ord_code,
+			payment_method,
+			payment_price,
+			payment_status,
+			payment_date 
+		from 
+			payment
+		where 
+			ord_code = #{ord_code}
+	</select>
+	
+	<update id="payment_price_change">
+	
+		update
+			payment
+		set
+			payment_price = payment_price - #{unit_price}
+		where
+			ord_code = #{ord_code}
+		
+	</update>
+
+</mapper>

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
+
+<head>
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 30px 0;
+    }
+
+    h2 {
+      font-weight: bold;
+      font-size: 2rem;
+    }
+
+    /* 카드 스타일 */
+	.card {
+	  background: #fff;
+	  border-radius: 16px;
+	  padding: 0;
+	  margin-bottom: 30px;
+	  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+	}
+	
+    .card-header {
+      background: #f1f3f5;
+      border-bottom: none;
+      border-radius: 16px 16px 0 0;
+      padding: 16px 24px;
+      font-weight: bold;
+      font-size: 1.2rem;
+      color: #333;
+    }
+
+    .card-body {
+      padding: 24px 16px;
+    }
+
+    label {
+      font-weight: 600;
+    }
+
+    input.form-control {
+      border-radius: 12px;
+      border: 1px solid #ccc;
+      padding: 10px;
+    }
+
+    /* 버튼 스타일 */
+    .btn-primary, .btn-secondary {
+      background: #000;
+      border: none;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 12px;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+    .btn-primary:hover, .btn-secondary:hover {
+      background: #333;
+    }
+
+  </style>
+</head>
+
+<th:block layout:fragment="content">
+  <div class="row mt-5">
+    <!-- 메뉴 -->
+    <div class="col-2">
+      <th:block th:replace="~{member/mypage_menu::menu}"></th:block>
+    </div>
+
+    <!-- 비밀번호 변경 폼 -->
+    <div class="col-10">
+      <h2 class="mt-4 mb-4 text-center">비밀번호 변경</h2>
+
+      <div class="row justify-content-center">
+        <div class="col-md-10">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title mb-0">비밀번호 변경</h3>
+            </div>
+
+            <form method="post" action="/member/pwchange" id="pwChangeForm">
+              <div class="card-body">
+
+                <!-- 기존 비밀번호 -->
+                <div class="row mb-3">
+                  <div class="col-md-6">
+                    <label for="cur_pw" class="form-label">기존 비밀번호</label>
+                    <input type="password" class="form-control" id="cur_pw" name="cur_pw" required>
+                  </div>
+                </div>
+
+                <!-- 새 비밀번호 -->
+                <div class="row mb-3">
+                  <div class="col-md-6">
+                    <label for="new_pw" class="form-label">신규 비밀번호</label>
+                    <input type="password" class="form-control" id="new_pw" name="new_pw" required>
+                  </div>
+                </div>
+
+                <!-- 비밀번호 확인 -->
+                <div class="row mb-3">
+                  <div class="col-md-6">
+                    <label for="confirm_pw" class="form-label">비밀번호 확인</label>
+                    <input type="password" class="form-control" id="confirm_pw" name="confirm_pw" required>
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- 버튼 -->
+              <div class="card-footer text-center">
+                <button type="button" class="btn btn-primary" id="btn_pwchange">비밀번호 변경</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</th:block>
+
+
+<th:block layout:fragment="script2">
+<script th:inline="javascript">
+	
+	$(document).ready(function() {
+		
+	// 비밀번호 변경하기(로그인상태) . id="btn_pwchange"
+		$("#btn_pwchange").on("click", function() {
+
+			$.ajax({
+				url : '/member/pwchange',
+				type: 'post',
+				data : {cur_pw : $("#cur_pw").val() , new_pw : $("#new_pw").val()}, // 자바스크립트 Object문법
+				dataType: 'text',
+				success : function(result) {
+					if(result == "success") {
+						alert("비밀번호가 변경되었습니다.");
+					}else if(result == "fail") {
+						alert("현재 비밀번호를 확인하세요.");
+					}
+					$("#cur_pw").val(""); // 현재비번 지우기
+					$("#new_pw").val(""); // 신규비번 지우기
+					$("#confirm_pw").val(""); // 신규비번 지우기
+				}
+			});
+		});
+
+	});
+</script>
+</th:block>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Order Confirmation</title>
+</head>
+<body style="font-family: Arial, sans-serif; margin: 20px;">
+    <div style="text-align: center; margin: 20px 0;">
+        <h3>아래와 같이 주문내역이 접수되었습니다.</h3>
+    </div>
+
+    <table style="width: 100%; border-collapse: collapse; font-size: 14px; text-align: center;">
+        <thead>
+            <tr>
+                <th style="border: 1px solid #dddddd; padding: 8px; background-color: #f2f2f2; font-weight: bold; width: 5%;">주문번호</th>
+                <th style="border: 1px solid #dddddd; padding: 8px; background-color: #f2f2f2; font-weight: bold; width: 25%;">상품이미지</th>
+                <th style="border: 1px solid #dddddd; padding: 8px; background-color: #f2f2f2; font-weight: bold; width: 15%;">상품이름</th>
+                <th style="border: 1px solid #dddddd; padding: 8px; background-color: #f2f2f2; font-weight: bold; width: 10%;">가격</th>
+                <th style="border: 1px solid #dddddd; padding: 8px; background-color: #f2f2f2; font-weight: bold; width: 5%;">수량</th>
+                <th style="border: 1px solid #dddddd; padding: 8px; background-color: #f2f2f2; font-weight: bold; width: 10%;">합계</th>
+                <th style="border: 1px solid #dddddd; padding: 8px; background-color: #f2f2f2; font-weight: bold; width: 15%;">주문상태</th>
+                <th style="border: 1px solid #dddddd; padding: 8px; background-color: #f2f2f2; font-weight: bold; width: 15%;">배송상태</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="item : ${order_info}" style="background-color: #ffffff;">
+                <td style="border: 1px solid #dddddd; padding: 8px;" th:text="${item.ord_code}"></td>
+                <td style="border: 1px solid #dddddd; padding: 8px;">
+                    <img style="width: 100px; height: 100px; display: block; margin: 0 auto;" 
+                         th:src="${'http://localhost:8888/order/image_display?dateFolderName=' + item.pro_up_folder + '&fileName=s_' + item.pro_img}">
+                </td>
+                <td style="border: 1px solid #dddddd; padding: 8px;" th:text="${item['pro_name']}"></td>
+                <td style="border: 1px solid #dddddd; padding: 8px;" th:text="${#numbers.formatInteger(item['oi_price'], 3, 'COMMA') + '원'}"></td>
+                <td style="border: 1px solid #dddddd; padding: 8px;" th:text="${item['oi_quantity']}"></td>
+                <td style="border: 1px solid #dddddd; padding: 8px;" th:text="${#numbers.formatInteger(item['oi_price'] * item['oi_quantity'], 3, 'COMMA') + '원'}"></td>
+                <td style="border: 1px solid #dddddd; padding: 8px;" th:text="${item.payment_status}"></td>
+                <td style="border: 1px solid #dddddd; padding: 8px;">준비중</td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="8" style="border: 1px solid #dddddd; padding: 10px; font-weight: bold; background-color: #f2f2f2; text-align: right;" 
+                    th:text="'총금액: ' + ${#numbers.formatInteger(order_total_price, 3, 'COMMA') + '원'}">
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+</body>
+</html>
